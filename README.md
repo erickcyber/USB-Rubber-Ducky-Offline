@@ -5,6 +5,10 @@
 This project aims to create an **offline USB Rubber Ducky** using a Raspberry Pi Pico. When connected to a computer, the device emulates a keyboard and automatically collects essential system information, saving it locally for later analysis—no internet connection required.
 
 > **Disclaimer:** This project is intended for educational purposes and controlled, ethical hacking environments only. Do not deploy on systems without explicit authorization.
+## Credits
+
+This project is based on [pico-ducky](https://github.com/dbisu/pico-ducky) created by [dbisu](https://github.com/dbisu).
+Special thanks to all contributors of the original pico-ducky project.
 
 ---
 
